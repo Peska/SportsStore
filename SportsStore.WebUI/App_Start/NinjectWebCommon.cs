@@ -3,15 +3,17 @@
 
 namespace SportsStore.WebUI.App_Start
 {
-    using System;
-    using System.Web;
+	using System;
+	using System.Web;
 
-    using Microsoft.Web.Infrastructure.DynamicModuleHelper;
+	using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 
-    using Ninject;
-    using Ninject.Web.Common;
+	using Ninject;
+	using Ninject.Web.Common;
+	using System.Web.Mvc;
+	using Infrastructure;
 
-    public static class NinjectWebCommon 
+	public static class NinjectWebCommon 
     {
         private static readonly Bootstrapper bootstrapper = new Bootstrapper();
 
@@ -61,6 +63,7 @@ namespace SportsStore.WebUI.App_Start
         /// <param name="kernel">The kernel.</param>
         private static void RegisterServices(IKernel kernel)
         {
+			DependencyResolver.SetResolver(new NinjectDependencyResolver(kernel));
         }        
     }
 }
