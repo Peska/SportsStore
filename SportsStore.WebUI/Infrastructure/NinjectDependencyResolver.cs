@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Ninject;
 using System.Web.Mvc;
+using SportsStore.Domain.Abstract;
+using SportsStore.Domain.Concrete;
 
 namespace SportsStore.WebUI.Infrastructure
 {
@@ -15,11 +17,6 @@ namespace SportsStore.WebUI.Infrastructure
 			AddBindings();
 		}
 
-		private void AddBindings()
-		{
-			// TODO
-		}
-
 		public object GetService(Type serviceType)
 		{
 			return kernel.TryGet(serviceType);
@@ -28,6 +25,11 @@ namespace SportsStore.WebUI.Infrastructure
 		public IEnumerable<object> GetServices(Type serviceType)
 		{
 			return kernel.GetAll(serviceType);
+		}
+
+		private void AddBindings()
+		{
+			kernel.Bind<IProductRepository>().To<EFProductRepository>();
 		}
 	}
 }
