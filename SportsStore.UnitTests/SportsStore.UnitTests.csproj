@@ -113,6 +113,10 @@
       <Project>{29659375-9773-43b8-a6df-83005587b052}</Project>
       <Name>SportsStore.Domain</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SportsStore.WebUI\SportsStore.WebUI.csproj">
+      <Project>{eb320ea8-272b-44a5-a95c-25302b6e4c7f}</Project>
+      <Name>SportsStore.WebUI</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
