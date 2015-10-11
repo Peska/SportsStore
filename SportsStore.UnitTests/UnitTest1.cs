@@ -31,7 +31,7 @@ namespace SportsStore.UnitTests
 			ProductController controller = new ProductController(mock.Object);
 			controller.PageSize = 3;
 
-			ProductListViewModel result = controller.List(2).Model as ProductListViewModel;
+			ProductListViewModel result = controller.List(null, 2).Model as ProductListViewModel;
 			Product[] prodArray = result.Products.ToArray();
 
 			Assert.AreEqual(2, prodArray.Length);
@@ -79,7 +79,7 @@ namespace SportsStore.UnitTests
 			ProductController controller = new ProductController(mock.Object);
 			controller.PageSize = 3;
 
-			ProductListViewModel result = controller.List(2).Model as ProductListViewModel;
+			ProductListViewModel result = controller.List(null, 2).Model as ProductListViewModel;
 
 			PagingInfo pageInfo = result.PaginInfo;
 
@@ -87,6 +87,31 @@ namespace SportsStore.UnitTests
 			Assert.AreEqual(3, pageInfo.ItemsPerPage);
 			Assert.AreEqual(5, pageInfo.TotalItems);
 			Assert.AreEqual(2, pageInfo.TotalPages);
+		}
+
+		[TestMethod]
+		public void CanFilerProducts()
+		{
+			Mock<IProductRepository> mock = new Mock<IProductRepository>();
+			mock.Setup(x => x.Products).Returns(new Product[]
+			{
+				new Product { ProductID = 1, Category = "Cat1", Name = "P1" },
+				new Product { ProductID = 2, Category = "Cat2", Name = "P2" },
+				new Product { ProductID = 3, Category = "Cat1", Name = "P3" },
+				new Product { ProductID = 4, Category = "Cat2", Name = "P4" },
+				new Product { ProductID = 5, Category = "Cat3", Name = "P5" },
+			});
+
+			ProductController controller = new ProductController(mock.Object);
+			controller.PageSize = 3;
+
+			Product[] result = (controller.List("Cat2", 1).Model as ProductListViewModel).Products.ToArray();
+
+			Assert.AreEqual(2, result.Count());
+			Assert.AreEqual("P2", result[0].Name);
+			Assert.AreEqual("Cat2", result[0].Category);
+			Assert.AreEqual("P4", result[1].Name);
+			Assert.AreEqual("Cat2", result[1].Category);
 		}
 	}
 }
