@@ -113,5 +113,73 @@ namespace SportsStore.UnitTests
 			Assert.AreEqual("P4", result[1].Name);
 			Assert.AreEqual("Cat2", result[1].Category);
 		}
+
+		[TestMethod]
+		public void CanCreateCategories()
+		{
+			Mock<IProductRepository> mock = new Mock<IProductRepository>();
+			mock.Setup(x => x.Products).Returns(new Product[]
+			{
+				new Product { ProductID = 1, Category = "Apples", Name = "P1" },
+				new Product { ProductID = 2, Category = "Apples", Name = "P2" },
+				new Product { ProductID = 3, Category = "Plums", Name = "P3" },
+				new Product { ProductID = 4, Category = "Oranges", Name = "P4" }
+			});
+
+			NavController target = new NavController(mock.Object);
+
+			IEnumerable<string> results = target.Menu().Model as IEnumerable<string>;
+
+			Assert.AreEqual(3, results.Count());
+			Assert.AreEqual("Apples", results.ElementAt(0));
+			Assert.AreEqual("Oranges", results.ElementAt(1));
+			Assert.AreEqual("Plums", results.ElementAt(2));
+		}
+
+		[TestMethod]
+		public void IndicatesSelectedCategory()
+		{
+			Mock<IProductRepository> mock = new Mock<IProductRepository>();
+			mock.Setup(x => x.Products).Returns(new Product[]
+			{
+				new Product { ProductID = 1, Category = "Apples", Name = "P1" },
+				new Product { ProductID = 4, Category = "Oranges", Name = "P4" }
+			});
+
+			NavController target = new NavController(mock.Object);
+
+			string categoryToSelect = "Apples";
+
+			string result = target.Menu(categoryToSelect).ViewBag.SelectedCategory;
+
+			Assert.AreEqual(categoryToSelect, result);
+        }
+
+		[TestMethod]
+		public void GenerateCategorySpecificProductCount()
+		{
+			Mock<IProductRepository> mock = new Mock<IProductRepository>();
+			mock.Setup(x => x.Products).Returns(new Product[]
+			{
+				new Product { ProductID = 1, Category = "Cat1", Name = "P1" },
+				new Product { ProductID = 2, Category = "Cat2", Name = "P2" },
+				new Product { ProductID = 3, Category = "Cat1", Name = "P3" },
+				new Product { ProductID = 4, Category = "Cat2", Name = "P4" },
+				new Product { ProductID = 5, Category = "Cat3", Name = "P5" },
+			});
+
+			ProductController controller = new ProductController(mock.Object);
+			controller.PageSize = 3;
+
+			int res1 = ((ProductListViewModel)controller.List("Cat1").Model).PaginInfo.TotalItems;
+			int res2 = ((ProductListViewModel)controller.List("Cat2").Model).PaginInfo.TotalItems;
+			int res3 = ((ProductListViewModel)controller.List("Cat3").Model).PaginInfo.TotalItems;
+			int resTotal = ((ProductListViewModel)controller.List(null).Model).PaginInfo.TotalItems;
+
+			Assert.AreEqual(2, res1);
+			Assert.AreEqual(2, res2);
+			Assert.AreEqual(1, res3);
+			Assert.AreEqual(5, resTotal);
+		}
 	}
 }
