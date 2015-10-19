@@ -5,6 +5,7 @@ using System.Linq;
 using Moq;
 using SportsStore.Domain.Abstract;
 using SportsStore.WebUI.Controllers;
+using System.Web.Mvc;
 
 namespace SportsStore.UnitTests
 {
@@ -55,12 +56,72 @@ namespace SportsStore.UnitTests
 
 			Cart cart = new Cart();
 
-			CartController target = new CartController(mock.Object);
+			CartController target = new CartController(mock.Object, null);
 
 			target.AddToCart(cart, 1, null);
 
 			Assert.AreEqual(1, cart.Lines.Count());
 			Assert.AreEqual(1, cart.Lines.ElementAt(0).Product.ProductID);
 		}
-	}
+
+		[TestMethod]
+		public void CannotChekoutEmptyCart()
+		{
+			Mock<IOrderProcessor> mock = new Mock<IOrderProcessor>();
+
+			Cart cart = new Cart();
+			ShippingDetails shippingDetails = new ShippingDetails();
+
+			CartController target = new CartController(null, mock.Object);
+
+			ViewResult result = target.Checkout(cart, shippingDetails);
+
+			mock.Verify(x => x.ProcessOrder(It.IsAny<Cart>(), It.IsAny<ShippingDetails>()), Times.Never);
+
+			Assert.AreEqual(string.Empty, result.ViewName);
+			Assert.AreEqual(false, result.ViewData.ModelState.IsValid);
+		}
+
+		[TestMethod]
+		public void CannotChekoutInvalidShippingDetails()
+		{
+			Mock<IOrderProcessor> mock = new Mock<IOrderProcessor>();
+
+			Cart cart = new Cart();
+			cart.AddItem(new Product(), 1);
+
+			ShippingDetails shippingDetails = new ShippingDetails();
+
+			CartController target = new CartController(null, mock.Object);
+			target.ModelState.AddModelError("error", "error");
+
+			ViewResult result = target.Checkout(cart, shippingDetails);
+
+			mock.Verify(x => x.ProcessOrder(It.IsAny<Cart>(), It.IsAny<ShippingDetails>()), Times.Never);
+
+			Assert.AreEqual(string.Empty, result.ViewName);
+
+			Assert.AreEqual(false, result.ViewData.ModelState.IsValid);
+		}
+
+		[TestMethod]
+		public void CanChekoutAndSubmitOrder()
+		{
+			Mock<IOrderProcessor> mock = new Mock<IOrderProcessor>();
+
+			Cart cart = new Cart();
+			cart.AddItem(new Product(), 1);
+
+			ShippingDetails shippingDetails = new ShippingDetails();
+
+			CartController target = new CartController(null, mock.Object);
+
+			ViewResult result = target.Checkout(cart, shippingDetails);
+
+			mock.Verify(x => x.ProcessOrder(It.IsAny<Cart>(), It.IsAny<ShippingDetails>()), Times.Once);
+
+			Assert.AreEqual("Completed", result.ViewName);
+			Assert.AreEqual(true, result.ViewData.ModelState.IsValid);
+		}
+    }
 }
