@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>@ViewBag.Title</title>
+	<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+	<style type=" text/css">
+		.navbar-right {
+			float: right !important;
+			margin-right: 15px;
+			margin-left: 15px;
+		}
+	</style>
+</head>
+<body>
+	<div data-role="page" id="page1">
+		<div data-theme="a" data-role="header" data-position="fixed">
+			<h3>SPORTS STORE</h3>
+			@Html.Action("Menu", "Nav")
+		</div>
+		<div data-role="content">
+			<ul data-role="listview" data-dividertheme="b" data-inset="false">
+				@RenderBody()
+			</ul>
+		</div>
+	</div>
+</body>
+</html>
